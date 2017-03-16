@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans">
+    <bean class="org.springframework.jdbc.datasource.DriverManagerDataSource" id="dataSource">
+        <property value="com.mysql.jdbc.Driver" name="driverClassName"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/phonebook"/>
+        <property name="username" value="root"/>
+        <property name="password" value=""/>
+    </bean>
+    <bean class="org.springframework.orm.hibernate4.LocalSessionFactoryBean" id="sessionFactory">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+            </props>
+        </property>
+        <property name="packagesToScan">
+            <list>
+                <value>com.yevgen</value>
+            </list>
+        </property>
+    </bean>
+    <bean class="org.springframework.orm.hibernate4.HibernateTransactionManager" id="transactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <security:http auto-config="true">
+        <security:intercept-url access="ROLE_USER" pattern="/contacts/**"/>
+        <security:intercept-url access="IS_AUTHENTICATED_ANONYMOUSLY" pattern="/login"/>
+        <security:intercept-url access="IS_AUTHENTICATED_ANONYMOUSLY" pattern="/register"/>
+        <security:form-login login-processing-url="/j_spring_security_check" password-parameter="password"
+                             username-parameter="login" default-target-url="/contacts"
+                             authentication-failure-url="/login?error" login-page="/login"/>
+        <security:logout logout-success-url="/login?logout" logout-url="/j_spring_security_logout"/>
+        <security:csrf/>
+    </security:http>
+    <security:authentication-manager>
+        <security:authentication-provider>
+            <security:jdbc-user-service
+                    authorities-by-username-query="SELECT login, role FROM user_roles WHERE login = ?"
+                    users-by-username-query="SELECT login, password, enabled FROM users WHERE login = ?"
+                    data-source-ref="dataSource"/>
+        </security:authentication-provider>
+    </security:authentication-manager>
+    <bean class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler"
+          id="defaultWebSecurityExpressionHandler"/>
+</beans>

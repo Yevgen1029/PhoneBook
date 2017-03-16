@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <user_contacts contact_id="1L"	first_name="first_name1"	second_name="second_name1"		patronymic="patronymic1" mobile_phone_number="+380(34)5555555"/>
+    <user_contacts contact_id="2L"	first_name="first_name2"	second_name="second_name2"		patronymic="patronymic2" mobile_phone_number="+380(34)5555557"/>
+</dataset>
